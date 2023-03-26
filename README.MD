@@ -41,6 +41,7 @@ Install Go-wrk
 ```bash
 go install github.com/tsliwowicz/go-wrk@latest
 ```
+### Test Benchmark
 Now you can run the benchmark tests separately using go-wrk:
 
 ```bash
@@ -48,4 +49,10 @@ go-wrk -c 10 http://localhost:8080/products/pooled
 go-wrk -c 10 http://localhost:8080/products/normal
 go-wrk -c 10 http://localhost:8080/products/new
 ```
+
 The results of each test will be displayed in the terminal.
+
+### Test elapsed time
+Or you can test it with the `index.html` file:
+
+![test.png](test.png)
