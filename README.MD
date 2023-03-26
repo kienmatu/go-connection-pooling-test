@@ -36,7 +36,6 @@ Run the Sample API:
 ```bash
 go run main.go
 ```
-Wait for 1 minute for the data to be seeded.
 
 Install Go-wrk
 ```bash
