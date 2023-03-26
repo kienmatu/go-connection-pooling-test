@@ -16,7 +16,7 @@ Once you have installed these dependencies, you can follow the steps below:
 Clone the repository:
 
 ```bash
-git clone https://github.com/kienmatu/go-connection-pooling-benchmark.git
+git clone https://github.com/kienmatu/go-connection-pooling-test.git
 cd go-connection-pooling-benchmark
 ```
 
