@@ -16,6 +16,9 @@ import (
 var allTime int64 = 0
 var allCount int64 = 0
 
+var newTime int64 = 0
+var newCount int64 = 0
+
 var poolTime int64 = 0
 var poolCount int64 = 0
 
@@ -38,14 +41,13 @@ func scanProducts(rows *sql.Rows) ([]*model.Product, error) {
 }
 
 func main() {
-	//runtime.GOMAXPROCS(2)
 	// Postgres allows 100 connections in default
 	// Set the maximum number of idle connections in the pool
 	idleConn := 10
 	// Set the maximum number of connections in the pool
 	maxConnections := 90
 	// Set the maximum amount of time a connection can be reused
-	maxConnLifetime := 5 * time.Minute
+	maxConnLifetime := 2 * time.Minute
 	poolConn, err := sqlx.Open("postgres", dsn)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
@@ -60,6 +62,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
+	// default will be 2 idle connections
 
 	// Initialize the HTTP router
 	router := gin.Default()
@@ -102,6 +105,29 @@ func main() {
 		poolCount++
 		poolTime += elapsed
 		c.JSON(http.StatusOK, model.Response{Elapsed: elapsed, Average: float64(poolTime / poolCount), Products: products})
+	})
+
+	router.GET("/products/new", func(c *gin.Context) {
+		startTime := time.Now()
+		conn, err := sqlx.Open("postgres", dsn)
+		if err != nil {
+			log.Fatalf("Unable to connect to database: %v\n", err)
+		}
+
+		rows, err := conn.Query(query)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		products, err := scanProducts(rows)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		elapsed := time.Since(startTime).Microseconds()
+		newCount++
+		newTime += elapsed
+		c.JSON(http.StatusOK, model.Response{Elapsed: elapsed, Average: float64(newTime / newCount), Products: products})
 	})
 
 	// Start the HTTP server
