@@ -8,9 +8,9 @@ services:
       - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
       - ./seed2.sql:/docker-entrypoint-initdb.d/seed2.sql
       - ./seed2.sql:/docker-entrypoint-initdb.d/seed3.sql
-      - ./seed2.sql:/docker-entrypoint-initdb.d/seed4.sql
-      - ./seed2.sql:/docker-entrypoint-initdb.d/seed5.sql
-      - ./seed2.sql:/docker-entrypoint-initdb.d/seed6.sql
+#      - ./seed2.sql:/docker-entrypoint-initdb.d/seed4.sql
+#      - ./seed2.sql:/docker-entrypoint-initdb.d/seed5.sql
+#      - ./seed2.sql:/docker-entrypoint-initdb.d/seed6.sql
       - ./data/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=${POSTGRES_DB:-postgres}

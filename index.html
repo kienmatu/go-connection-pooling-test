@@ -13,53 +13,55 @@
         }
 
         button {
-            font-size: 20px;
-            margin-right: 10px;
+            margin-left: .5rem;
+            right: .5rem;
+            display: inline-block;
+            outline: 0;
+            cursor: pointer;
+            padding: 5px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 20px;
+            vertical-align: middle;
+            border: 1px solid;
+            border-radius: 6px;
+            color: #ffffff;
+            background-color: #2ea44f;
+            border-color: #1b1f2326;
+            box-shadow: rgba(27, 31, 35, 0.04) 0px 1px 0px 0px, rgba(255, 255, 255, 0.25) 0px 1px 0px 0px inset;
+            transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+            transition-property: color, background-color, border-color;
         }
+        button:hover {
+            background-color: #2c974b;
+            border-color: #1b1f2326;
+            transition-duration: 0.1s;
+        }
+
     </style>
 </head>
 <body>
-<button id="productsBtn">Get Products</button>
-<button id="productsPoolBtn">Get Products (Using Connection Pool)</button>
+<button id="productsBtn" onclick="getProducts('normal')">Get Products</button>
+<button id="productsSingletonBtn" onclick="getProducts('new')">Get Products | Singleton</button>
+<button id="productsPoolBtn" onclick="getProducts('pooled')">Get Products | Connection Pool</button>
 <script>
-    function getProducts() {
+    function getProducts(mode) {
         let lastResult = null;
         const promises = [];
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 200; i++) {
             promises.push(
-                fetch('/products')
+                fetch(`/products/${mode}`)
                     .then(response => response.json())
-                    .then(({ elapsed, average, products }) => {
-                        lastResult = { elapsed, average };
-                        console.log({ elapsed, average });
+                    .then(({elapsed, average, products}) => {
+                        lastResult = {elapsed, average};
+                        console.log({elapsed, average});
                     })
             );
         }
         Promise.all(promises)
-            .then(() => console.log('Last result:', lastResult))
+            .then(() => console.log(`Last result for ${mode}:`, lastResult))
             .catch(error => console.error(error));
     }
-
-    function getProductsPool() {
-        let lastResult = null;
-        const promises = [];
-        for (let i = 0; i < 1000; i++) {
-            promises.push(
-                fetch('/products/pool')
-                    .then(response => response.json())
-                    .then(({ elapsed, average, products }) => {
-                        lastResult = { elapsed, average };
-                        console.log({ elapsed, average });
-                    })
-            );
-        }
-        Promise.all(promises)
-            .then(() => console.log('Last result:', lastResult))
-            .catch(error => console.error(error));
-    }
-
-    document.getElementById('productsBtn').addEventListener('click', getProducts);
-    document.getElementById('productsPoolBtn').addEventListener('click', getProductsPool);
 </script>
 
 </body>
