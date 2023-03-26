@@ -1,0 +1,21 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:13.1-alpine
+    container_name: postgres_container
+    volumes:
+      - ./seed.sql:/docker-entrypoint-initdb.d/seed.sql
+      - ./seed2.sql:/docker-entrypoint-initdb.d/seed2.sql
+      - ./seed2.sql:/docker-entrypoint-initdb.d/seed3.sql
+      - ./seed2.sql:/docker-entrypoint-initdb.d/seed4.sql
+      - ./seed2.sql:/docker-entrypoint-initdb.d/seed5.sql
+      - ./seed2.sql:/docker-entrypoint-initdb.d/seed6.sql
+      - ./data/postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-postgres}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-password1}
+    ports:
+      - "5433:5432"
+    restart: unless-stopped

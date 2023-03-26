@@ -1,0 +1,66 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gin API Example</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        button {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+<button id="productsBtn">Get Products</button>
+<button id="productsPoolBtn">Get Products (Using Connection Pool)</button>
+<script>
+    function getProducts() {
+        let lastResult = null;
+        const promises = [];
+        for (let i = 0; i < 1000; i++) {
+            promises.push(
+                fetch('/products')
+                    .then(response => response.json())
+                    .then(({ elapsed, average, products }) => {
+                        lastResult = { elapsed, average };
+                        console.log({ elapsed, average });
+                    })
+            );
+        }
+        Promise.all(promises)
+            .then(() => console.log('Last result:', lastResult))
+            .catch(error => console.error(error));
+    }
+
+    function getProductsPool() {
+        let lastResult = null;
+        const promises = [];
+        for (let i = 0; i < 1000; i++) {
+            promises.push(
+                fetch('/products/pool')
+                    .then(response => response.json())
+                    .then(({ elapsed, average, products }) => {
+                        lastResult = { elapsed, average };
+                        console.log({ elapsed, average });
+                    })
+            );
+        }
+        Promise.all(promises)
+            .then(() => console.log('Last result:', lastResult))
+            .catch(error => console.error(error));
+    }
+
+    document.getElementById('productsBtn').addEventListener('click', getProducts);
+    document.getElementById('productsPoolBtn').addEventListener('click', getProductsPool);
+</script>
+
+</body>
+</html>
