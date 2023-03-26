@@ -42,7 +42,6 @@
 </head>
 <body>
 <button id="productsBtn" onclick="getProducts('normal')">Get Products</button>
-<button id="productsSingletonBtn" onclick="getProducts('new')">Get Products | Singleton</button>
 <button id="productsPoolBtn" onclick="getProducts('pooled')">Get Products | Connection Pool</button>
 <script>
     function getProducts(mode) {
@@ -59,7 +58,10 @@
             );
         }
         Promise.all(promises)
-            .then(() => console.log(`Last result for ${mode}:`, lastResult))
+            .then(() => {
+                console.log(`Last result for ${mode}:`, lastResult);
+                // alert(`Average: ${lastResult.average}, elapsed: ${lastResult.elapsed}`)
+            })
             .catch(error => console.error(error));
     }
 </script>

@@ -1,8 +1,7 @@
 # go install github.com/tsliwowicz/go-wrk@latest
 # run separately
 go-wrk -c 10  http://localhost:8080/products/pooled &&
-go-wrk -c 10  http://localhost:8080/products/normal &&
-go-wrk -c 10  http://localhost:8080/products/new
+go-wrk -c 10  http://localhost:8080/products/normal
 
 #   Usage: go-wrk <options> <url>
 #   Options:
