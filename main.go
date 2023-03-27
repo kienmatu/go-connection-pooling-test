@@ -1,7 +1,9 @@
 package main
 
 import (
-	"database/sql"
+	"context"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 	"net/http"
 	"time"
@@ -9,8 +11,6 @@ import (
 	"github.com/kienmatu/go-connection-pooling/model"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
 )
 
 var allTime int64 = 0
@@ -25,7 +25,7 @@ var poolCount int64 = 0
 var dsn = "postgres://postgres:password1@localhost:5433/postgres?sslmode=disable"
 var query = "SELECT id, name, price, description FROM products limit 1000"
 
-func scanProducts(rows *sql.Rows) ([]*model.Product, error) {
+func scanProducts(rows pgx.Rows) ([]*model.Product, error) {
 	defer rows.Close()
 
 	products := make([]*model.Product, 0)
@@ -48,33 +48,35 @@ func main() {
 	maxConnections := 90
 	// Set the maximum amount of time a connection can be reused
 	maxConnLifetime := 2 * time.Minute
-	poolConn, err := sqlx.Open("postgres", dsn)
+	dbConfig, err := pgxpool.ParseConfig(dsn)
+	dbConfig.MaxConnIdleTime = maxConnLifetime
+	dbConfig.MaxConns = int32(maxConnections)
+	dbConfig.MinConns = int32(idleConn)
+	if err != nil {
+		log.Fatalf("Unable to connect to database: %v\n", err)
+	}
+	poolConn, err := pgxpool.NewWithConfig(context.Background(), dbConfig)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
 	defer poolConn.Close()
-	poolConn.SetMaxOpenConns(maxConnections)
-	poolConn.SetMaxIdleConns(idleConn)
-	poolConn.SetConnMaxLifetime(maxConnLifetime)
 
 	// normal connection
-	conn, err := sqlx.Open("postgres", dsn)
+	conn, err := pgx.Connect(context.Background(), dsn)
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
-	// default will be 2 idle connections
-	// so set it to 0 to simulate
-	//conn.SetMaxIdleConns(0)
 
 	// Initialize the HTTP router
 	router := gin.Default()
 	router.StaticFile("/", "./index.html")
 
+	// One single connection for all requests
 	router.GET("/products/normal", func(c *gin.Context) {
 		startTime := time.Now()
-
+		ctx := c.Request.Context()
 		// Query the database for all products
-		rows, err := conn.Query(query)
+		rows, err := conn.Query(ctx, query)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -91,9 +93,15 @@ func main() {
 	})
 
 	router.GET("/products/pooled", func(c *gin.Context) {
+		ctx := c.Request.Context()
 		startTime := time.Now()
+		conn, err := poolConn.Acquire(ctx)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 		// Query the database for all products
-		rows, err := poolConn.Query(query)
+		rows, err := conn.Query(ctx, query)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
@@ -111,12 +119,13 @@ func main() {
 
 	router.GET("/products/new", func(c *gin.Context) {
 		startTime := time.Now()
-		conn, err := sqlx.Open("postgres", dsn)
+		ctx := c.Request.Context()
+		conn, err := pgx.Connect(ctx, dsn)
 		if err != nil {
 			log.Fatalf("Unable to connect to database: %v\n", err)
 		}
 
-		rows, err := conn.Query(query)
+		rows, err := conn.Query(ctx, query)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
