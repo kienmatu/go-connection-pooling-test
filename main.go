@@ -43,7 +43,7 @@ func scanProducts(rows *sql.Rows) ([]*model.Product, error) {
 func main() {
 	// Postgres allows 100 connections in default
 	// Set the maximum number of idle connections in the pool
-	idleConn := 10
+	idleConn := 50
 	// Set the maximum number of connections in the pool
 	maxConnections := 90
 	// Set the maximum amount of time a connection can be reused
@@ -63,6 +63,8 @@ func main() {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
 	// default will be 2 idle connections
+	// so set it to 0 to simulate
+	//conn.SetMaxIdleConns(0)
 
 	// Initialize the HTTP router
 	router := gin.Default()
