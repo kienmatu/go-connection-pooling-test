@@ -63,8 +63,8 @@ func main() {
 		log.Fatalf("Unable to connect to database: %v\n", err)
 	}
 	// default will be 2 idle connections
-	// so set it to 0 to simulate
-	//conn.SetMaxIdleConns(0)
+	// so set it to 1 to simulate
+	conn.SetMaxIdleConns(1)
 
 	// Initialize the HTTP router
 	router := gin.Default()
