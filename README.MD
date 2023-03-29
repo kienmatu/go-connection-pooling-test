@@ -56,3 +56,7 @@ The results of each test will be displayed in the terminal.
 Or you can test it with the `index.html` file:
 
 ![test.png](test.png)
+
+
+I tried in nodejs and express, but using pool still slower 4 times than Go-Gin.
+Go is king of performance :v

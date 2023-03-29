@@ -1,1 +1,3 @@
 /data
+/expressjs/node_modules
+/expressjs/yarn.lock
