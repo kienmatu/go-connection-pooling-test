@@ -60,7 +60,7 @@ Or you can test it with the `index.html` file:
 ### How many connections is the best fit for pool size?
 Actually, I set 50 and 90 for the first time bench, after that I realize that too much number of connections is not efficient.
 
-The efficient number of connection pool size should be the same as your server/machine's physical core.
+The efficient number of connection pool size should be the same as your server/machine's physical number of cores.
 
 I tested with 4 for both idle connections and max pool size, and the result nearly the same with 50 idle and 90 max conns.
 
