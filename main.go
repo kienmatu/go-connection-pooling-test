@@ -43,9 +43,9 @@ func scanProducts(rows *sql.Rows) ([]*model.Product, error) {
 func main() {
 	// Postgres allows 100 connections in default
 	// Set the maximum number of idle connections in the pool
-	idleConn := 50
+	idleConn := 4
 	// Set the maximum number of connections in the pool
-	maxConnections := 90
+	maxConnections := 4
 	// Set the maximum amount of time a connection can be reused
 	maxConnLifetime := 2 * time.Minute
 	poolConn, err := sqlx.Open("postgres", dsn)

@@ -57,6 +57,12 @@ Or you can test it with the `index.html` file:
 
 ![test.png](test.png)
 
+### How many connections is the best fit for pool size?
+Actually, I set 50 and 90 for the first time bench, after that I realize that too much number of connections is not efficient.
 
-I tried in nodejs and express, but using pool still slower 4 times than Go-Gin.
-Go is king of performance :v
+The efficient number of connection pool size should be the same as your server/machine's physical core.
+
+I tested with 4 for both idle connections and max pool size, and the result nearly the same with 50 idle and 90 max conns.
+
+
+I just also added the code in expressjs (but yeah, of course, the performance can not be strong as Go).
